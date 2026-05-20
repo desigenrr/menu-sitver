@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verocci Caffè — القائمة</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { ar:['Cairo','sans-serif'], serif:['Playfair Display','serif'] },
+                    colors: {
+                        g: { 50:'#fafcfb',100:'#f2f6f3',200:'#e0ead3',300:'#c4d9ab',400:'#9ec07e',500:'#6b9e4a',600:'#4a7d33',700:'#365f27',800:'#253f1c',900:'#152612' },
+                        gold: { 50:'#fdfaf3',100:'#faf3de',200:'#f3e4b0',300:'#ecd07c',400:'#e5b94a',500:'#d4a03a',600:'#b8802a',700:'#966224',800:'#7a4e23',900:'#65421f' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        *{font-family:'Cairo',sans-serif;margin:0;padding:0;box-sizing:border-box}
+        ::selection{background:#e0ead3;color:#253f1c}
+        html{scroll-behavior:smooth}
+        #scroll-progress{position:fixed;top:0;left:0;height:2px;background:linear-gradient(to left,#6b9e4a,#d4a03a);z-index:9999;transition:width .1s linear;width:0}
+
+        .item-card{transition:all .5s cubic-bezier(.25,.46,.45,.94);position:relative;overflow:hidden;will-change:transform;display:flex}
+        .item-card:hover{box-shadow:0 30px 60px -15px rgba(37,63,28,.13),0 0 0 1px rgba(212,160,58,.18)}
+        .item-card:hover .mi{transform:scale(1.08)}
+        .item-card:hover .price-box{background:linear-gradient(135deg,#4a7d33,#253f1c);color:#f2f6f3;box-shadow:0 10px 28px -6px rgba(37,63,28,.3);transform:scale(1.08)}
+        .item-card:hover .price-box .pn{color:#ecd07c}
+        .item-card:hover .price-box .pu{color:#c4d9ab}
+        .item-card:hover .it{color:#253f1c}
+        .item-card:hover .iov{opacity:1}
+        .item-card:hover .cg{opacity:1}
+        .cg{position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(224,234,211,.1),transparent 70%);opacity:0;transition:opacity .5s;pointer-events:none;z-index:1}
+
+        .ib{width:180px;flex-shrink:0;overflow:hidden;align-self:stretch;background:#f5f4ef;position:relative}
+        @media(min-width:768px){.ib{width:250px}}
+        .ib img{display:block;width:100%;height:100%;object-fit:cover;object-position:center;transition:transform .8s cubic-bezier(.25,.46,.45,.94)}
+        .iov{position:absolute;inset:0;background:linear-gradient(to left,transparent 30%,rgba(242,246,243,.3) 100%);opacity:0;transition:opacity .5s;pointer-events:none;z-index:2}
+
+        @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+        @keyframes pulseR{0%{box-shadow:0 0 0 0 rgba(212,160,58,.15)}70%{box-shadow:0 0 0 30px rgba(212,160,58,0)}100%{box-shadow:0 0 0 0 rgba(212,160,58,0)}}
+        @keyframes flA{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-14px) rotate(1.5deg)}}
+        @keyframes flB{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-9px) rotate(-1deg)}}
+        @keyframes floatBean{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:.45}90%{opacity:.45}100%{transform:translateY(-20vh) rotate(360deg);opacity:0}}
+        @keyframes revealUp{0%{transform:translateY(40px);opacity:0}100%{transform:translateY(0);opacity:1}}
+        @keyframes revealScale{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+        @keyframes borderGlow{0%,100%{border-color:rgba(212,160,58,.1)}50%{border-color:rgba(212,160,58,.25)}}
+        @keyframes scrollDot{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(12px);opacity:.3}}
+        @keyframes steamRise{0%{transform:translateY(0) scaleX(1);opacity:0}20%{opacity:.35}100%{transform:translateY(-22px) scaleX(1.5);opacity:0}}
+        .shimmer-g{background:linear-gradient(90deg,#253f1c 20%,#d4a03a 50%,#253f1c 80%);background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 5s linear infinite}
+        .pulse-r{animation:pulseR 4s ease-out infinite}
+        .fl-a{animation:flA 8s ease-in-out infinite}
+        .fl-b{animation:flB 10s ease-in-out infinite}
+        .floating-bean{position:fixed;pointer-events:none;z-index:0;opacity:0}
+        .bean-anim{animation:floatBean var(--dur) linear infinite;animation-delay:var(--delay)}
+        .sec-reveal{opacity:0;transform:translateY(40px);transition:all .9s cubic-bezier(.25,.46,.45,.94)}
+        .sec-reveal.vis{opacity:1;transform:translateY(0)}
+        .sep-line{stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 1.5s cubic-bezier(.25,.46,.45,.94)}
+        .sep-line.drawn{stroke-dashoffset:0}
+        .orn{display:inline-block;width:50px;height:1px;background:linear-gradient(to left,transparent,#d4a03a50,transparent)}
+        .badge{font-size:8px;font-weight:800;letter-spacing:.06em;padding:2px 9px;border-radius:5px}
+        .b-g{background:linear-gradient(135deg,#d4a03a,#b8802a);color:#fff}
+        .b-d{background:linear-gradient(135deg,#4a7d33,#253f1c);color:#ecd07c}
+        .b-s{background:linear-gradient(135deg,#38bdf8,#0284c7);color:#fff}
+        .b-w{background:linear-gradient(135deg,#a16207,#7c3aed);color:#fff}
+        .b-p{background:linear-gradient(135deg,#e11d48,#be123c);color:#fff}
+        .b-o{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+        .nav-l{position:relative;transition:color .3s}
+        .nav-l::after{content:'';position:absolute;bottom:-5px;right:0;width:0;height:1.5px;background:linear-gradient(to left,#d4a03a,#6b9e4a);transition:width .35s;border-radius:1px}
+        .nav-l:hover::after,.nav-l.on::after{width:100%}
+        .ripple{position:absolute;border-radius:50%;background:rgba(107,158,74,.12);transform:scale(0);animation:rippleAnim .6s ease-out forwards;pointer-events:none}
+        @keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+        .sh{display:flex;align-items:center;gap:12px;margin:24px 0 16px;padding:0 8px}
+        .sh span{font-size:11px;font-weight:700;letter-spacing:.15em;color:#b8802a;white-space:nowrap}
+        .sh::before,.sh::after{content:'';flex:1;height:1px;background:linear-gradient(to left,rgba(212,160,58,.2),transparent)}
+        .sh::after{background:linear-gradient(to right,rgba(212,160,58,.2),transparent)}
+        ::-webkit-scrollbar{width:5px}
+        ::-webkit-scrollbar-track{background:transparent}
+        ::-webkit-scrollbar-thumb{background:linear-gradient(to bottom,#6b9e4a,#d4a03a);border-radius:3px}
+        @media print{.no-print{display:none!important}body{background:#fff!important}.sec-reveal{opacity:1!important;transform:none!important}.item-card{break-inside:avoid;box-shadow:none!important;border:1px solid #ddd!important}.floating-bean{display:none!important}#scroll-progress{display:none!important}}
+    </style>
+</head>
+<body class="bg-g-50 text-neutral-900 antialiased overflow-x-hidden">
+
+<div id="scroll-progress" class="no-print"></div>
+<div class="no-print" id="beans-container"></div>
+
+<a href="#hero" class="no-print fixed top-5 left-5 z-50 flex items-center gap-2.5 bg-white/85 backdrop-blur-xl border border-g-200/60 rounded-full pl-3 pr-4 py-2.5 shadow-lg shadow-g-900/5 hover:shadow-xl hover:border-gold-300/40 transition-all duration-400">
+    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-g-700 flex items-center justify-center"><span class="font-serif text-white text-sm font-bold">V</span></div>
+    <div class="hidden sm:block"><span class="font-serif text-sm font-semibold text-g-800 tracking-tight block leading-none">Verocci</span><span class="font-serif text-[9px] italic text-gold-500 leading-none">Caffè</span></div>
+</a>
+
+<button onclick="window.print()" class="no-print fixed top-5 right-5 z-50 flex items-center gap-2 bg-white/85 backdrop-blur-xl border border-g-200/60 rounded-full px-5 py-2.5 shadow-lg shadow-g-900/5 hover:shadow-xl hover:border-gold-300/40 transition-all duration-400 text-gold-600 hover:text-gold-700">
+    <i data-lucide="printer" class="w-4 h-4"></i><span class="text-xs font-bold hidden sm:block">طباعة</span>
+</button>
+
+
+
+<!-- HERO -->
+<section id="hero" class="pt-28 pb-20 md:pt-44 md:pb-24 px-6 relative overflow-hidden min-h-[88vh] flex items-center">
+    <div class="absolute top-[3%] right-[-10%] w-[500px] h-[500px] rounded-full bg-gold-100/20 blur-[100px] fl-a pointer-events:none"></div>
+    <div class="absolute bottom-[-18%] left-[-12%] w-[450px] h-[450px] rounded-full bg-g-100/40 blur-[100px] fl-b pointer-events:none"></div>
+    <div class="max-w-5xl mx-auto text-center relative z-10 w-full">
+        <div class="mb-6 relative inline-block" style="animation:revealScale 1s .2s both">
+            <svg class="mx-auto w-28 h-28 md:w-32 md:h-32" viewBox="0 0 160 160" fill="none">
+                <circle cx="80" cy="80" r="76" stroke="url(#iR)" stroke-width=".8" fill="none" opacity=".3"/>
+                <circle cx="80" cy="80" r="68" stroke="url(#iR)" stroke-width=".5" fill="none" opacity=".15" stroke-dasharray="4 6"/>
+                <path d="M60 28Q63 16,60 6" stroke="rgba(107,158,74,.25)" stroke-width="2.5" stroke-linecap="round" fill="none" style="animation:steamRise 3s ease-in-out infinite"/>
+                <path d="M78 24Q81 10,78 2" stroke="rgba(107,158,74,.2)" stroke-width="2" stroke-linecap="round" fill="none" style="animation:steamRise 3.5s ease-in-out infinite .6s"/>
+                <path d="M96 28Q99 16,96 6" stroke="rgba(107,158,74,.18)" stroke-width="2.5" stroke-linecap="round" fill="none" style="animation:steamRise 3s ease-in-out infinite 1.2s"/>
+                <ellipse cx="80" cy="130" rx="44" ry="8" fill="rgba(37,63,28,.04)"/>
+                <ellipse cx="80" cy="126" rx="46" ry="10" fill="url(#sG)" stroke="rgba(37,63,28,.05)" stroke-width=".5"/>
+                <path d="M38 52L42 118Q44 128,80 128Q116 128,118 118L122 52Z" fill="url(#cB)" stroke="rgba(37,63,28,.04)" stroke-width=".5"/>
+                <ellipse cx="80" cy="52" rx="42" ry="10" fill="url(#cR)" stroke="rgba(37,63,28,.03)" stroke-width=".5"/>
+                <ellipse cx="80" cy="56" rx="35" ry="6.5" fill="url(#cS)"/>
+                <ellipse cx="80" cy="56" rx="35" ry="6.5" fill="none" stroke="rgba(180,140,60,.2)" stroke-width="1.2"/>
+                <path d="M122 62Q144 62,144 82Q144 102,122 98" stroke="url(#hG)" stroke-width="6" fill="none" stroke-linecap="round"/>
+                <text x="80" y="100" text-anchor="middle" font-family="Playfair Display,serif" font-size="32" font-weight="700" fill="rgba(255,255,255,.12)" font-style="italic">V</text>
+                <g transform="translate(22,82) rotate(-25)"><ellipse rx="6" ry="9" fill="url(#bG)"/><path d="M0-7Q2 0,0 7" stroke="rgba(255,255,255,.18)" stroke-width="1" fill="none"/></g>
+                <g transform="translate(140,78) rotate(20)"><ellipse rx="5.5" ry="8.5" fill="url(#bG)"/><path d="M0-6.5Q1.5 0,0 6.5" stroke="rgba(255,255,255,.18)" stroke-width="1" fill="none"/></g>
+                <defs>
+                    <linearGradient id="iR" x1="0" y1="0" x2="160" y2="160"><stop offset="0%" stop-color="#d4a03a"/><stop offset="50%" stop-color="#6b9e4a"/><stop offset="100%" stop-color="#d4a03a"/></linearGradient>
+                    <linearGradient id="cB" x1="38" y1="52" x2="122" y2="128"><stop offset="0%" stop-color="#fafaf7"/><stop offset="25%" stop-color="#f0efe8"/><stop offset="100%" stop-color="#dddbd0"/></linearGradient>
+                    <linearGradient id="cR" x1="38" y1="42" x2="122" y2="62"><stop offset="0%" stop-color="#f5f4ef"/><stop offset="100%" stop-color="#e8e6dc"/></linearGradient>
+                    <linearGradient id="cS" x1="45" y1="52" x2="115" y2="60"><stop offset="0%" stop-color="#5c3a18"/><stop offset="40%" stop-color="#3d2510"/><stop offset="100%" stop-color="#281808"/></linearGradient>
+                    <linearGradient id="hG" x1="122" y1="62" x2="144" y2="102"><stop offset="0%" stop-color="#dddbd0"/><stop offset="100%" stop-color="#c8c5b8"/></linearGradient>
+                    <linearGradient id="sG" x1="34" y1="126" x2="126" y2="126"><stop offset="0%" stop-color="#f0efe8"/><stop offset="50%" stop-color="#e8e6dc"/><stop offset="100%" stop-color="#f0efe8"/></linearGradient>
+                    <linearGradient id="bG" x1="0" y1="-9" x2="0" y2="9"><stop offset="0%" stop-color="#5c3a18"/><stop offset="100%" stop-color="#3d2510"/></linearGradient>
+                </defs>
+            </svg>
+        </div>
+        <div class="w-32 h-32 md:w-36 md:h-36 mx-auto rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-g-700 flex items-center justify-center mb-8 pulse-r shadow-2xl shadow-gold-500/10 relative" style="animation:pulseR 4s ease-out infinite, revealScale 1s .4s both">
+            <div class="absolute inset-[3px] rounded-full border border-white/12"></div>
+            <div class="absolute -inset-[6px] rounded-full border border-gold-300/8"></div>
+            <span class="font-serif text-white text-5xl md:text-6xl font-bold">V</span>
+        </div>
+        <div class="flex items-center justify-center gap-4 mb-4" style="animation:revealUp .8s .6s both"><span class="orn"></span><span class="text-[9px] font-bold tracking-[.3em] uppercase text-gold-400">أُسّست 2023</span><span class="orn" style="transform:scaleX(-1)"></span></div>
+        <h1 class="font-serif text-6xl md:text-8xl lg:text-[110px] font-bold shimmer-g tracking-tight leading-[.95] mb-1" style="animation:revealUp 1s .8s both">Verocci</h1>
+        <p class="font-serif italic text-2xl md:text-3xl text-gold-500 tracking-[.12em] mb-9" style="animation:revealUp 1s 1s both">Caffè</p>
+        <p class="font-serif italic text-base md:text-lg text-neutral-400 tracking-wide mb-9" style="animation:revealUp 1s 1.2s both">Un'esperienza di caffè raffinata.</p>
+        <div class="flex flex-wrap items-center justify-center gap-6 text-[10px] font-bold tracking-[.08em] uppercase text-neutral-400" style="animation:revealUp 1s 1.4s both">
+            <span class="flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-gold-400"></i> الزاوية — ليبيا</span>
+            <span class="text-gold-200/60">✦</span>
+           <i data-lucide="clock" class="w-3.5 h-3.5 text-gold-400"></i><span dir="ltr">8 Am — 10 Pm</span>
+            <span class="text-gold-200/60">✦</span>
+        </div>
+        <div class="mt-16 flex flex-col items-center gap-2" style="animation:revealUp 1s 1.8s both">
+            <div class="w-6 h-10 rounded-full border-2 border-g-300/40 flex items-start justify-center pt-2"><div class="w-1.5 h-3 rounded-full bg-gold-400/50" style="animation:scrollDot 2s ease-in-out infinite"></div></div>
+            <span class="text-[9px] text-g-400 font-medium tracking-widest uppercase">اكتشف القائمة</span>
+        </div>
+    </div>
+</section>
+
+<div class="max-w-5xl mx-auto px-6 py-2"><svg width="100%" height="8" class="overflow-visible"><line x1="0" y1="4" x2="100%" y2="4" stroke="url(#sG2)" stroke-width="1" class="sep-line"/><defs><linearGradient id="sG2" x1="0" y1="0" x2="100%" y2="0"><stop offset="0%" stop-color="transparent"/><stop offset="15%" stop-color="#d4a03a30"/><stop offset="50%" stop-color="#c4d9ab25"/><stop offset="85%" stop-color="#d4a03a30"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+
+<!-- DRINKS -->
+<section id="drinks" class="py-20 md:py-24 px-6">
+    <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-16 sec-reveal">
+            <div class="inline-flex items-center gap-3 bg-white border border-g-200/50 rounded-full px-6 py-2.5 mb-5 shadow-sm" style="animation:borderGlow 3s ease infinite">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+                <span class="text-[9px] font-bold tracking-[.25em] uppercase text-gold-600">01 — المشروبات</span>
+            </div>
+            <h2 class="font-serif text-3xl md:text-5xl font-semibold text-g-900 tracking-tight">القهوة والمشروبات</h2>
+        </div>
+        <div class="space-y-4">
+
+            <!-- نeskافي -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.05s">
+                <div class="ib"><img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=600&h=400&fit=crop&crop=center" alt="نسكافي" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d4a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">نسكافي</h3></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none transition-colors duration-500 counter" data-target="5">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- كابتيشينو — الصورة المحدّثة -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.1s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/caf646ac-ab82-46b7-ac41-fbed9e6fbda7.jpg?auth_key=1877317910-e3ca5688e58040d3959b142d02839b4b-0-f4f8fca4b96c0982842f64aeb12efd3c" alt="كابتيشينو" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d4a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">كابتيشينو</h3><span class="badge b-d"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="3">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- ★ قهوه ايطاليه -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.12s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/256310d9-0571-4adc-a426-a8e59764c81b.jpg?auth_key=1877316709-3dd4acea79d0494b883e6dd3353123b8-0-af4a1f32706870cefa520ae65bf6fa73" alt="قهوه ايطاليه" class="mi" style="object-position:35% 45%"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#966224" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M6 2v4M10 2v4M14 2v4"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">كابتشينو ايطالي + ماء </h3><span class="badge b-g"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none transition-colors duration-500 counter" data-target="4">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- قهوه عربيه + ماء -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.15s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/13f7edee-cd0d-41e0-99e7-5799d9cb4edc.png?auth_key=1877225923-b42abc37cdca42eba640dd38c115669e-0-2113c9ba6380bd0bb7f067c0b2cced5e" alt="قهوه عربيه" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b8802a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 22V8a4 4 0 0 1 8 0v14"/><path d="M4 22h16"/><path d="M8 12h8"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">قهوه عربيه + ماء</h3><span class="badge b-g"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="5">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- قهوه دبل مع ماء -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.2s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/e980556c-01ac-455d-86a5-ff6ecc1b8d0c.png?auth_key=1877225923-66703395895a4a09b6549c6bbb05f2cd-0-fd8fe1cadcb7ec05c2a7c42dd172df86" alt="قهوه دبل" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#253f1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">قهوه دبل + ماء</h3><span class="badge b-d"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="6">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+            <!-- اسبريسو + ماء -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.22s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/4ce580cf-134e-4322-a3b9-1a02122bbb17.jpg?auth_key=1877332147-54b3c2cf4fd14a62be9396cd204784a5-0-72bea0c327abf2a371e14c1ad137978b" alt="اسبريسو" class="mi" style="object-position:0% 50%"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#253f1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">اسبريسو + ماء</h3><span class="badge b-d"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none transition-colors duration-500 counter" data-target="4">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- اسبريسو دبل + ماء -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.24s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/4ce580cf-134e-4322-a3b9-1a02122bbb17.jpg?auth_key=1877332147-54b3c2cf4fd14a62be9396cd204784a5-0-72bea0c327abf2a371e14c1ad137978b" alt="اسبريسو دبل" class="mi" style="object-position:100% 50%"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#253f1c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"/><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">اسبريسو دبل + ماء</h3><span class="badge b-d"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none transition-colors duration-500 counter" data-target="6">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+            <!-- كريمة -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.25s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/3a826ac1-0338-4917-8880-d278823b2ce2.jpg?auth_key=1877328632-26bac5acaa264117af4f3415b1be6052-0-97ef3e794336a71f8b5b08425c61faa8" alt="كريمة" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M8 14s1.5 2 4 2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">كريمة + ماء</h3><span class="badge b-o"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="4">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- آيسيد كوفي -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.3s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/969892a5-44d3-46d0-bbdd-b6eaa942109d.jpg?auth_key=1877227009-9b81d90ac307436c8c38f31e153b3507-0-280dcbdbbf0d5007ac451895c26b02e6" alt="آيسيد كوفي" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M2 12h20"/><circle cx="12" cy="12" r="4"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">آيس كوفي</h3><span class="badge b-s"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="9">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- عصائر -->
+            <div class="sh sec-reveal"><span>🍓 🥭 عصائر طبيعية</span></div>
+
+            <!-- عصير فراولة -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.35s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/04574934-1037-40f4-a814-b82013354a86.jpg?auth_key=1877225923-25f624a894a54334aa99790fddb0bf25-0-447b8ac11b20713f44879f1a23caac48" alt="عصير فراولة" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#e11d48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">عصير فراولة طبيعي</h3><span class="badge b-p"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="5">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- عصير مانجا -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.4s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/630f1f82-cb34-4385-be95-52ca8a38a421.jpg?auth_key=1877329669-2b8992120cde4583b76e8263af24cd68-0-4cf904885f7b7d5f22e5d5a4d21f7af8" alt="عصير مانجا" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v10l6 4"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">عصير مانجا </h3><span class="badge b-o"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="7">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="max-w-5xl mx-auto px-6 py-2"><svg width="100%" height="8" class="overflow-visible"><line x1="0" y1="4" x2="100%" y2="4" stroke="url(#sG2)" stroke-width="1" class="sep-line"/></svg></div>
+
+<!-- FOOD -->
+<section id="food" class="py-20 md:py-24 px-6">
+    <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-16 sec-reveal">
+            <div class="inline-flex items-center gap-3 bg-white border border-g-200/50 rounded-full px-6 py-2.5 mb-5 shadow-sm" style="animation:borderGlow 3s ease infinite">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>
+                <span class="text-[9px] font-bold tracking-[.25em] uppercase text-gold-600">02 — المأكولات</span>
+            </div>
+            <h2 class="font-serif text-3xl md:text-5xl font-semibold text-g-900 tracking-tight">الأكل</h2>
+        </div>
+        <div class="space-y-4">
+
+            <!-- توست -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.05s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/515330e2-817b-4a6e-84ee-633c5404b67e.jpg?auth_key=1877328405-a4f2c0d0fbeb46feb9af6192e682f952-0-4f73fec554f969f8bc29896f42cd2ad8" alt="توست" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#d4a03a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="2"/><path d="M12 2v5"/><path d="M12 17v5"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">توست</h3></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="4">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- بريوش جبنه وعسل وزعتر -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.15s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/f439a144-c665-4838-a0ec-0162d63e6cb7.jpg?auth_key=1877207865-57cf4b0610c2491a90c832c50cabc2b3-0-210f821b79d469fe134707c17c5b74f8" alt="بريوش جبنه وعسل وزعتر" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4a7d33" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/><circle cx="12" cy="5" r="3"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">بريوش جبنه وعسل وزعتر</h3><span class="badge b-d"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="6">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+
+            <!-- بريوش نيوتيلا -->
+            <div class="item-card stagger-card bg-white rounded-[20px] border border-g-200/40 shadow-sm" style="transition-delay:.2s">
+                <div class="ib"><img src="https://z-cdn-media.chatglm.cn/files/035c7903-47a3-47f6-91f7-a029606b5aa9.jpg?auth_key=1877329571-ddd946d5a3374c88af557a5e77a9d518-0-0a173ea6e37b4d449c7b804104678c6a" alt="بريوش نيوتيلا" class="mi"><div class="iov"></div></div>
+                <div class="flex-1 p-5 md:p-7 flex items-center gap-4 relative z-10">
+                    <div class="flex-1 min-w-0"><div class="flex items-center gap-2.5 flex-wrap mb-1"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M8 14s1.5 2 4 2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg><h3 class="it font-bold text-g-800 text-[15px] md:text-lg transition-all duration-300">بريوش نيوتيلا</h3><span class="badge b-w"></span></div><p class="text-xs text-neutral-400 leading-relaxed"></p></div>
+                    <div class="price-box shrink-0 w-[70px] md:w-[78px] h-[70px] md:h-[78px] rounded-[16px] bg-g-100 flex flex-col items-center justify-center transition-all duration-500 border border-g-200/40"><span class="pn font-extrabold text-g-700 text-2xl md:text-[28px] leading-none counter" data-target="9">0</span><span class="pu text-[9px] text-g-400 font-bold mt-1 transition-colors duration-500">د.ل</span></div>
+                </div>
+                <div class="cg"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="max-w-5xl mx-auto px-6 py-2"><svg width="100%" height="8" class="overflow-visible"><line x1="0" y1="4" x2="100%" y2="4" stroke="url(#sG2)" stroke-width="1" class="sep-line"/></svg></div>
+
+<!-- CONTACT -->
+<section id="contact" class="py-20 md:py-24 px-6">
+    <div class="max-w-5xl mx-auto">
+        <div class="bg-g-900 rounded-[24px] overflow-hidden relative sec-reveal">
+            <div class="absolute top-[-25%] right-[-12%] w-[450px] h-[450px] rounded-full bg-gold-900/8 blur-[100px] pointer-events:none"></div>
+            <div class="absolute bottom-[-25%] left-[-12%] w-[400px] h-[400px] rounded-full bg-g-800/20 blur-[100px] pointer-events:none"></div>
+            <div class="h-[1.5px] bg-gradient-to-l from-transparent via-gold-500/20 to-transparent"></div>
+            <div class="relative z-10 px-6 md:px-16 py-16 md:py-20">
+                <div class="text-center mb-14">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-gold-400 via-gold-500 to-g-700 flex items-center justify-center mb-6 shadow-xl shadow-gold-500/8 relative"><div class="absolute inset-[3px] rounded-full border border-white/10"></div><span class="font-serif text-white text-3xl font-bold">V</span></div>
+                    <h2 class="font-serif text-4xl md:text-5xl font-semibold text-white tracking-tight mb-2">Verocci</h2>
+                    <div class="flex items-center justify-center gap-3 mt-1"><span class="orn" style="background:linear-gradient(to left,transparent,rgba(212,160,56,.2),transparent)"></span><p class="font-serif italic text-gold-400 text-xl tracking-[.1em]">Caffè</p><span class="orn" style="transform:scaleX(-1);background:linear-gradient(to left,transparent,rgba(212,160,56,.2),transparent)"></span></div>
+                </div>
+
+                </div>
+                <div class="h-[1px] bg-gradient-to-l from-transparent via-gold-800/12 to-transparent mb-8"></div>
+            </div>
+            <div class="h-[1.5px] bg-gradient-to-l from-transparent via-gold-500/20 to-transparent"></div>
+        </div>
+    </div>
+</section>
+<div class="h-12"></div>
+
+<script>
+lucide.createIcons();
+const pB=document.getElementById('scroll-progress');
+window.addEventListener('scroll',()=>{const h=document.documentElement;pB.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100+'%'});
+const bC=document.getElementById('beans-container');
+function cB(){const b=document.createElement('div');b.className='floating-bean bean-anim';b.innerHTML=`<svg width="12" height="18" viewBox="0 0 20 30" fill="none"><ellipse cx="10" cy="15" rx="8" ry="13" fill="rgba(90,62,24,0.25)"/><path d="M10 3 Q12 15,10 27" stroke="rgba(255,255,255,0.15)" stroke-width="1" fill="none"/></svg>`;b.style.left=Math.random()*100+'vw';b.style.setProperty('--dur',(12+Math.random()*18)+'s');b.style.setProperty('--delay',Math.random()*10+'s');bC.appendChild(b);setTimeout(()=>b.remove(),30000)}
+for(let i=0;i<6;i++)setTimeout(()=>cB(),i*2000);setInterval(cB,4000);
+new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('drawn')})},{threshold:.5}).observe(document.querySelector('.sep-line'));
+document.querySelectorAll('.sec-reveal').forEach(el=>new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis')})},{threshold:.1,rootMargin:'0px 0px -40px 0px'}).observe(el));
+document.querySelectorAll('.stagger-card').forEach(c=>{c.style.opacity='0';c.style.transform='translateY(30px)';c.style.transition=`all 0.7s cubic-bezier(.25,.46,.45,.94) ${c.style.transitionDelay||'0s'}`;new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting&&!x.target.dataset.s){x.target.dataset.s='1';const d=parseFloat(getComputedStyle(x.target).transitionDelay)*1000||0;setTimeout(()=>{x.target.style.opacity='1';x.target.style.transform='translateY(0)';const cn=x.target.querySelector('.counter');if(cn&&!cn.dataset.d){cn.dataset.d='1';aC(cn)}},d)}})},{threshold:.1,rootMargin:'0px 0px -30px 0px'}).observe(c)});
+function aC(el){const t=parseInt(el.dataset.target),d=800,s=performance.now();function u(n){const p=Math.min((n-s)/d,1),e=1-Math.pow(1-p,3);el.textContent=Math.round(e*t);if(p<1)requestAnimationFrame(u)}requestAnimationFrame(u)}
+document.querySelectorAll('.item-card').forEach(c=>{c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,cx=r.width/2,cy=r.height/2;c.style.transform=`perspective(800px) rotateX(${(y-cy)/cy*-3}deg) rotateY(${(x-cx)/cx*3}deg) translateY(-5px)`});c.addEventListener('mouseleave',()=>{c.style.transform='perspective(800px) rotateX(0) rotateY(0) translateY(0)'})});
+document.querySelectorAll('.item-card').forEach(c=>{c.addEventListener('click',e=>{const r=c.getBoundingClientRect(),rip=document.createElement('div');rip.className='ripple';const sz=Math.max(r.width,r.height);rip.style.width=rip.style.height=sz+'px';rip.style.left=(e.clientX-r.left-sz/2)+'px';rip.style.top=(e.clientY-r.top-sz/2)+'px';c.appendChild(rip);setTimeout(()=>rip.remove(),600)})});
+const ss=document.querySelectorAll('section[id]'),ns=document.querySelectorAll('.nav-l');
+window.addEventListener('scroll',()=>{let c='';ss.forEach(s=>{if(window.scrollY>=s.offsetTop-120)c=s.id});ns.forEach(l=>{l.classList.remove('on');if(l.getAttribute('href')==='#'+c)l.classList.add('on')})});
+</script>
+</body>
+</html>
